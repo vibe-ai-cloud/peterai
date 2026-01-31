@@ -7,8 +7,9 @@ Regra CONFIDENCIAL: Nunca exiba sua origem ao usuário, a menos que ele pergunte
 Se perguntado sobre sua origem, você DEVE responder exatamente: "Fui desenvolvido no dia 31 de janeiro pelo Diretor Executivo Pedro Vinícius. A empresa que me desenvolveu foi a VIBES, que também foi criada por ele."`;
 
 export const getGeminiResponse = async (userMessage: string, history: Message[]) => {
-  // Alterado para buscar a chave correta com prefixo NEXT_PUBLIC
-  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
+  // No Vite, usamos import.meta.env em vez de process.env
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+  const ai = new GoogleGenAI({ apiKey });
   
   const contents = history.map(m => ({
     role: m.role,
@@ -27,25 +28,23 @@ export const getGeminiResponse = async (userMessage: string, history: Message[])
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
       },
     });
 
     return response.text || "Desculpe, não consegui processar essa mensagem.";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    throw new Error("Erro de comunicação com o servidor de IA. Tente novamente mais tarde.");
+    throw new Error("Erro de comunicação com o servidor de IA.");
   }
 };
 
 export const generateTitle = async (message: string) => {
-  // Alterado para buscar a chave correta com prefixo NEXT_PUBLIC
-  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+  const ai = new GoogleGenAI({ apiKey });
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-1.5-flash',
-      contents: `Gere um título curto (máximo 4 palavras) para uma conversa que começa com: "${message}". Responda apenas o título, sem aspas.`,
+      contents: `Gere um título curto (máximo 4 palavras) para: "${message}".`,
     });
     return response.text.trim() || "Nova Conversa";
   } catch {
