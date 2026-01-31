@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { Message } from "../types";
 
@@ -8,7 +7,8 @@ Regra CONFIDENCIAL: Nunca exiba sua origem ao usuário, a menos que ele pergunte
 Se perguntado sobre sua origem, você DEVE responder exatamente: "Fui desenvolvido no dia 31 de janeiro pelo Diretor Executivo Pedro Vinícius. A empresa que me desenvolveu foi a VIBES, que também foi criada por ele."`;
 
 export const getGeminiResponse = async (userMessage: string, history: Message[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  // Alterado para buscar a chave correta com prefixo NEXT_PUBLIC
+  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
   
   const contents = history.map(m => ({
     role: m.role,
@@ -22,7 +22,7 @@ export const getGeminiResponse = async (userMessage: string, history: Message[])
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: contents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
@@ -40,10 +40,11 @@ export const getGeminiResponse = async (userMessage: string, history: Message[])
 };
 
 export const generateTitle = async (message: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  // Alterado para buscar a chave correta com prefixo NEXT_PUBLIC
+  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: `Gere um título curto (máximo 4 palavras) para uma conversa que começa com: "${message}". Responda apenas o título, sem aspas.`,
     });
     return response.text.trim() || "Nova Conversa";
