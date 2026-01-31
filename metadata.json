@@ -1,0 +1,8 @@
+{
+  "name": "Copy of PETER AI",
+  "description": "A premium, minimalist AI chat application with a sophisticated dark aesthetic, powered by advanced cognitive processing.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
