@@ -6,33 +6,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({ error: "GEMINI_API_KEY not set" });
-    }
-
     const { message } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
-    }
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.0-pro",
     });
 
     const result = await model.generateContent(message);
-    const text = result.response.text();
+    const response = result.response.text();
 
-    return res.status(200).json({ text });
-
+    res.status(200).json({ reply: response });
   } catch (err) {
     console.error("Gemini error:", err);
-    return res.status(500).json({
-      error: "Internal server error",
-      details: err.message || err,
-    });
+    res.status(500).json({ error: "Erro ao falar com o servidor" });
   }
 }
