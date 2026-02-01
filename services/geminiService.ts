@@ -1,20 +1,26 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Na Vercel, ele vai ler VITE_GEMINI_API_KEY
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
-const genAI = new GoogleGenerativeAI(apiKey);
-
-export const getGeminiResponse = async (userMessage: string, history: any[]) => {
-  if (!apiKey) return "ERRO: Chave API não configurada na Vercel.";
-
+export const getGeminiResponse = async (userMessage: string) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(userMessage);
-    return result.response.text();
-  } catch (error: any) {
-    console.error("Erro detalhado:", error);
-    return `Erro de conexão. Verifique se a região está em São Paulo e a chave está ativa.`;
+    const res = await fetch("/api/gemini", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: userMessage }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Erro desconhecido");
+    }
+
+    return data.text;
+  } catch (error) {
+    console.error(error);
+    return "Erro ao falar com o servidor.";
   }
 };
 
-export const generateTitle = async (msg: string) => "Conversa Peter";
+export const generateTitle = async () => {
+  return "Conversa";
+};
