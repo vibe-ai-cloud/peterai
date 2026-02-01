@@ -1,23 +1,20 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// Na Vercel, ele vai ler VITE_GEMINI_API_KEY
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
 
 export const getGeminiResponse = async (userMessage: string, history: any[]) => {
+  if (!apiKey) return "ERRO: Chave API não configurada na Vercel.";
+
   try {
-    // Forçamos o modelo estável "gemini-pro" se o flash falhar
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-    
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(userMessage);
-    const response = await result.response;
-    return response.text();
+    return result.response.text();
   } catch (error: any) {
-    // Se der erro, ele vai te avisar se o problema é a CHAVE
-    if (error.message.includes("API_KEY_INVALID")) {
-      return "Sua Chave de API está inválida no Google.";
-    }
-    return "Erro de conexão. Verifique se a cota do Google acabou.";
+    console.error("Erro detalhado:", error);
+    return `Erro de conexão. Verifique se a região está em São Paulo e a chave está ativa.`;
   }
 };
 
-export const generateTitle = async () => "Conversa Peter";
+export const generateTitle = async (msg: string) => "Conversa Peter";
